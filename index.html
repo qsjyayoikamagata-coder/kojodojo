@@ -49,7 +49,7 @@
             position: relative;
             display: flex;
             flex-direction: column;
-            padding: 15px;
+            padding: 15px 15px 35px 15px; /* 下部にフッター固定用の余白 */
         }
         
         .header-title {
@@ -83,12 +83,13 @@
             display: none; 
             flex-direction: column;
             height: 100%;
-            overflow-y: auto;
+            overflow: hidden;
         }
         .screen.active { display: flex; }
         
-        /* 修行中画面はスクロールさせず1画面固定 */
-        #screen-quiz { overflow: hidden; }
+        #screen-start {
+            height: calc(100% - 30px); /* 引継ぎボタン用のスペース確保 */
+        }
 
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 6px; font-weight: bold; font-size: 14px; color: var(--wood-dark); }
@@ -147,16 +148,17 @@
             flex-shrink: 0;
         }
         .menu-tab-btn {
-            padding: 8px 2px;
+            padding: 8px 1px;
             background: #e0d7c7;
             border: 2px solid var(--wood-dark);
             border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 12px;
+            font-size: 11px;
             color: var(--wood-dark);
             font-family: 'Yuji Syuku', serif;
             text-align: center;
+            white-space: nowrap;
         }
         .menu-tab-btn.active {
             background: var(--tatami-border);
@@ -199,7 +201,7 @@
             font-family: 'Yuji Syuku', serif; font-weight: bold; font-size: 14px; border: 1px solid var(--accent-gold);
         }
 
-        .menu-content { display: none; height: 100%; }
+        .menu-content { display: none; height: 100%; overflow: hidden; }
         .menu-content.active { display: flex; flex-direction: column; }
 
         .dan-info-card {
@@ -244,10 +246,63 @@
         th { background-color: var(--wood-dark); color: #fbfbf6; }
         
         .result-card { background: var(--tatami-bg); padding: 15px; border-radius: 4px; margin: 10px 0; border: 1px dashed var(--tatami-border); font-size: 14px; }
-        .footer-credit { text-align: center; margin-top: auto; padding-top: 10px; font-size: 11px; color: var(--wood-light); font-family: 'Yuji Syuku', serif; flex-shrink: 0; }
         
-        /* バックアップ用テキストエリア */
-        .sync-box { width: 100%; height: 60px; font-size: 12px; margin-top: 5px; padding: 5px; border: 1px solid var(--wood-light); background: #fff; }
+        /* ⑤ 著作権クレジット下部完全固定 */
+        .footer-credit { 
+            position: absolute;
+            bottom: 6px;
+            left: 0;
+            width: 100%;
+            text-align: center; 
+            font-size: 11px; 
+            color: var(--wood-light); 
+            font-family: 'Yuji Syuku', serif; 
+            z-index: 50;
+            background-color: transparent;
+            pointer-events: none;
+        }
+        
+        /* ④ トップページ最下部の極小引継ぎボタンエリア */
+        .bottom-sync-trigger-zone {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            display: none;
+            justify-content: center;
+            z-index: 40;
+        }
+        .btn-mini-sync {
+            background: none;
+            border: none;
+            color: #795548;
+            font-size: 10px;
+            text-decoration: underline;
+            cursor: pointer;
+            padding: 2px 10px;
+        }
+
+        /* 引継ぎ用ポップアップ（モーダル窓） */
+        .sync-modal {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .sync-modal-content {
+            background: var(--washi-white);
+            border: 4px solid var(--wood-dark);
+            border-radius: 6px;
+            width: 100%;
+            max-width: 400px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .sync-box { width: 100%; height: 50px; font-size: 11px; margin-top: 3px; padding: 4px; border: 1px solid var(--wood-light); background: #fff; resize: none;}
     </style>
 </head>
 <body>
@@ -256,6 +311,20 @@
     <div id="pause-screen" class="pause-overlay">
         <div class="pause-title">一時停止中</div>
         <button class="btn btn-accent btn-resume" onclick="resumeQuiz()">再開</button>
+    </div>
+
+    <div id="sync-modal-window" class="sync-modal">
+        <div class="sync-modal-content">
+            <h4 style="margin: 0 0 10px 0; font-family:'Yuji Syuku', serif; color:var(--wood-dark); border-bottom:1px solid var(--wood-light); padding-bottom:3px;">📱 履歴の引継ぎ・同期</h4>
+            
+            <button class="btn" style="padding:4px; font-size:11px; height:auto;" onclick="exportData()">1. 現在の記録を暗号コードにする</button>
+            <textarea id="sync-output" class="sync-box" readonly placeholder="ボタンを押すとここにコードが出ます。コピーして他端末へ送ってください。"></textarea>
+            
+            <button class="btn btn-accent" style="padding:4px; font-size:11px; height:auto; margin-top:8px;" onclick="importData()">2. 他の端末のコードを読み込む</button>
+            <textarea id="sync-input" class="sync-box" placeholder="コピーした暗号コードをここに貼り付けてください。"></textarea>
+            
+            <button class="btn" style="margin-top:12px; padding:6px; background:#795548; font-size:12px;" onclick="closeSyncModal()">閉じる</button>
+        </div>
     </div>
 
     <div class="header-title">
@@ -272,7 +341,6 @@
             <input type="password" id="login-birthday" placeholder="例：20150401" autocomplete="off">
         </div>
         <button class="btn btn-accent" onclick="loginOrRegister()">道場に入門する</button>
-        <div class="footer-credit">by Que sais-je? Yayoi Kamagata</div>
     </div>
 
     <div id="screen-start" class="screen">
@@ -290,8 +358,8 @@
         <div class="mypage-menu-tabs">
             <button class="menu-tab-btn active" id="menu-btn-practice" onclick="switchMainMenu('practice')">練習</button>
             <button class="menu-tab-btn" id="menu-btn-dan" onclick="switchMainMenu('dan')">段位道場</button>
-            <button class="menu-tab-btn" id="menu-btn-ranking" onclick="switchMainMenu('ranking')">番付</button>
-            <button class="menu-tab-btn" id="menu-btn-record" onclick="switchMainMenu('record')">同期・記録</button>
+            <button class="menu-tab-btn" id="menu-btn-ranking" onclick="switchMainMenu('ranking')">今週の番付</button>
+            <button class="menu-tab-btn" id="menu-btn-record" onclick="switchMainMenu('record')">個人の記録</button>
         </div>
 
         <div id="menu-content-practice" class="menu-content active">
@@ -331,8 +399,8 @@
                     <div class="opt-btn" onclick="selectOption('tab-mix', 'レベル2')">レベル2</div>
                     <div class="opt-btn" onclick="selectOption('tab-mix', 'レベル3')">レベル3</div>
                 </div>
-                <div id="tab-time" class="sub-options" style="text-align: center; padding: 10px;">
-                    <p style="margin: 0; font-weight: bold; color: var(--tatami-border); font-size:12px;">すぐに20問テストが始まります！</p>
+                <div id="tab-time" class="sub-options" style="text-align: center; padding: 10px; display:none; grid-template-columns:1fr;">
+                    <p style="margin: 0; font-weight: bold; color: var(--tatami-border); font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">すぐに20問テストが始まります！</p>
                 </div>
             </div>
             <button class="btn btn-accent" onclick="startQuiz(false)">練習を開始する</button>
@@ -342,7 +410,7 @@
             <div class="dan-info-card">
                 <h3 style="margin:0 0 5px 0; color:var(--error-red); font-size:14px;">昇段試験</h3>
                 <p style="margin:0 0 5px 0; line-height:1.4;">タイムアタック**20問**のスコア（ミス減点＋実時間）で格付け判定します。</p>
-                <p style="font-weight:bold; color:var(--wood-light); margin:0;">【目安】1級:<68点 / 初段:<56点 / 名人:<34点</p>
+                <p style="font-weight:bold; color:var(--wood-light); margin:0; font-size:11px;">【合格の目標タイム】1級: 68秒以内 / 初段: 56秒以内 / 名人: 34秒以内</p>
             </div>
             <button class="btn btn-accent" style="background-color:#9a2a2a; color:white; border-color:#5a1414;" onclick="startQuiz(true)">昇段試練に挑む</button>
         </div>
@@ -358,15 +426,6 @@
 
         <div id="menu-content-record" class="menu-content">
             <div class="scrollable-content">
-                <div style="background:#ecdcb9; padding:8px; border-radius:4px; border:1px solid var(--wood-light); margin-bottom:10px;">
-                    <span style="font-size:12px; font-weight:bold; color:var(--wood-dark);">📱 別の端末へ記録を引き継ぐ・同期する</span>
-                    <button class="btn" style="padding:4px; font-size:11px; margin-top:5px;" onclick="exportData()">① データを保存用文字にする</button>
-                    <textarea id="sync-output" class="sync-box" readonly placeholder="ボタンを押すとここに暗号コードが出ます。コピーして他端末へ送ってください。"></textarea>
-                    
-                    <button class="btn btn-accent" style="padding:4px; font-size:11px; margin-top:8px;" onclick="importData()">② 他の端末のデータを読み込む</button>
-                    <textarea id="sync-input" class="sync-box" placeholder="コピーした暗号コードをここに貼り付けてください。"></textarea>
-                </div>
-
                 <div style="font-size:12px; margin-bottom:8px;">通算修行: <span id="total-count" style="font-weight:bold; color:var(--tatami-border);">0</span> 回</div>
                 <button id="btn-wrong-quiz" class="btn btn-wrong" style="display:none;" onclick="startWrongQuiz()">誤答を解き直す（残り <span id="wrong-count">0</span> 問）</button>
                 <table id="personal-best-table">
@@ -375,7 +434,10 @@
                 </table>
             </div>
         </div>
-        <div class="footer-credit">by Que sais-je? Yayoi Kamagata</div>
+    </div>
+
+    <div id="mini-sync-zone" class="bottom-sync-trigger-zone">
+        <button class="btn-mini-sync" onclick="openSyncModal()">履歴の引継ぎ・同期</button>
     </div>
 
     <div id="screen-quiz" class="screen">
@@ -425,6 +487,8 @@
         </div>
         <button class="btn" onclick="backToStart()">マイページへ</button>
     </div>
+
+    <div class="footer-credit">by Que sais-je? Yayoi Kamagata</div>
 </div>
 
 <script>
@@ -472,7 +536,10 @@
         }
     });
 
-    // 🌟 データ書き出し（保存機能）
+    // ④ ポップアップ制御関数
+    function openSyncModal() { document.getElementById('sync-modal-window').style.display = 'flex'; }
+    function closeSyncModal() { document.getElementById('sync-modal-window').style.display = 'none'; }
+
     function exportData() {
         const data = {
             users: localStorage.getItem('dojo_v5_users'),
@@ -482,10 +549,9 @@
         const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
         document.getElementById('sync-output').value = encoded;
         document.getElementById('sync-output').select();
-        alert("引き継ぎ暗号文字を作成しました！自動で全選択されていますのでコピーして、別の端末の『読み込み』枠に貼り付けてください。");
+        alert("引き継ぎ暗号コードを作成しました！コピーして、もう一方の端末に貼り付けてください。");
     }
 
-    // 🌟 データ読み込み（復元・同期機能）
     function importData() {
         const code = document.getElementById('sync-input').value.trim();
         if(!code) { alert("暗号コードを入力してください"); return; }
@@ -495,9 +561,10 @@
             if(decoded.results) localStorage.setItem('dojo_v5_results', decoded.results);
             if(decoded.wrong && currentStudent) localStorage.setItem('dojo_v5_wrong_' + currentStudent, decoded.wrong);
             alert("同期に成功しました！データを反映します。");
+            closeSyncModal();
             loadData();
         } catch(e) {
-            alert("正しい暗号コードではないか、破損しています。");
+            alert("正しい暗号コードではないか、データが破損しています。");
         }
     }
 
@@ -539,8 +606,14 @@
     function switchTab(tabId) {
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         event.target.classList.add('active');
-        document.querySelectorAll('.sub-options').forEach(opt => opt.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
+        document.querySelectorAll('.sub-options').forEach(opt => opt.style.display = 'none');
+        
+        const currentTab = document.getElementById(tabId);
+        if(tabId === 'tab-time') {
+            currentTab.style.display = 'block'; // TAタブは1行テキスト用
+        } else {
+            currentTab.style.display = 'grid';
+        }
         
         if (tabId === 'tab-add') currentOption = '1桁+1桁';
         if (tabId === 'tab-sub') currentOption = '1桁-1桁';
@@ -634,6 +707,28 @@
         showQuestion();
         startTime = performance.now();
         startTimerLoop();
+    }
+
+    // ② 番付は「昇段試練（タイムアタック）」のみを集計・ソートして表示
+    function loadGlobalRanking() {
+        let allResults = JSON.parse(localStorage.getItem('dojo_v5_results')) || [];
+        let users = JSON.parse(localStorage.getItem('dojo_v5_users')) || {};
+        let bestPerStudent = {};
+        
+        allResults.filter(item => item.mode === 'タイムアタック').forEach(item => {
+            if (!bestPerStudent[item.name] || item.score < bestPerStudent[item.name].score) bestPerStudent[item.name] = item;
+        });
+        
+        let rankedResults = Object.values(bestPerStudent).sort((a, b) => a.score - b.score);
+        const rankBody = document.querySelector('#global-ranking-table tbody');
+        rankBody.innerHTML = rankedResults.length === 0 ? "<tr><td colspan='5' style='text-align:center;'>データなし</td></tr>" : "";
+        
+        rankedResults.slice(0, 10).forEach((item, index) => {
+            let tr = document.createElement('tr');
+            let aDan = users[item.name] ? calculateDan(users[item.name].highestScore) : (item.afterDan || "10級");
+            tr.innerHTML = `<td>${index + 1}位</td><td>${item.name}</td><td>${aDan}</td><td>${item.accuracy}%</td><td>${item.time}秒</td>`;
+            rankBody.appendChild(tr);
+        });
     }
 
     function startTimerLoop() {
@@ -759,24 +854,6 @@
         localStorage.setItem('dojo_v5_results', JSON.stringify(allResults));
     }
 
-    function loadGlobalRanking() {
-        let allResults = JSON.parse(localStorage.getItem('dojo_v5_results')) || [];
-        let users = JSON.parse(localStorage.getItem('dojo_v5_users')) || {};
-        let bestPerStudent = {};
-        allResults.filter(item => item.mode === 'タイムアタック').forEach(item => {
-            if (!bestPerStudent[item.name] || item.score < bestPerStudent[item.name].score) bestPerStudent[item.name] = item;
-        });
-        let rankedResults = Object.values(bestPerStudent).sort((a, b) => a.score - b.score);
-        const rankBody = document.querySelector('#global-ranking-table tbody');
-        rankBody.innerHTML = rankedResults.length === 0 ? "<tr><td colspan='5' style='text-align:center;'>データなし</td></tr>" : "";
-        rankedResults.slice(0, 10).forEach((item, index) => {
-            let tr = document.createElement('tr');
-            let aDan = users[item.name] ? calculateDan(users[item.name].highestScore) : (item.afterDan || "10級");
-            tr.innerHTML = `<td>${index + 1}位</td><td>${item.name}</td><td>${aDan}</td><td>${item.accuracy}%</td><td>${item.time}秒</td>`;
-            rankBody.appendChild(tr);
-        });
-    }
-
     function loadData() {
         document.getElementById('my-name').innerText = currentStudent;
         let users = JSON.parse(localStorage.getItem('dojo_v5_users')) || {};
@@ -806,9 +883,18 @@
     }
 
     function backToStart() { loadData(); switchScreen('screen-start'); }
+    
     function switchScreen(screenId) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(screenId).classList.add('active');
+        
+        // マイページ画面のときだけ最下部に小さな引継ぎボタンを表示
+        const syncZone = document.getElementById('mini-sync-zone');
+        if(screenId === 'screen-start') {
+            syncZone.style.display = 'flex';
+        } else {
+            syncZone.style.display = 'none';
+        }
     }
 </script>
 </body>
