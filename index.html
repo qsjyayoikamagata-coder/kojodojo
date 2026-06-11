@@ -39,6 +39,7 @@
             overflow: hidden;
         }
         
+        /* 外枠のサイズを完全統一・固定 */
         .container {
             width: 100%;
             max-width: 500px;
@@ -49,7 +50,7 @@
             position: relative;
             display: flex;
             flex-direction: column;
-            padding: 15px 15px 35px 15px; /* 下部にフッター固定用の余白 */
+            padding: 15px 15px 35px 15px;
         }
         
         .header-title {
@@ -77,20 +78,19 @@
             border-left: 5px solid var(--tatami-border);
             margin: 10px 0;
             border-radius: 2px;
+            flex-shrink: 0;
         }
         
+        /* 各画面レイアウトのサイズを統一 */
         .screen { 
             display: none; 
             flex-direction: column;
             height: 100%;
             overflow: hidden;
+            flex: 1;
         }
         .screen.active { display: flex; }
         
-        #screen-start {
-            height: calc(100% - 30px); /* 引継ぎボタン用のスペース確保 */
-        }
-
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 6px; font-weight: bold; font-size: 14px; color: var(--wood-dark); }
         
@@ -123,14 +123,26 @@
         .btn-accent { background-color: #cda831; color: #1a1a1a; border: 2px solid #a6841c; }
         .btn-wrong { background-color: #9a2a2a; border-color: #5a1414; color: white; padding: 8px; font-size: 14px; margin-bottom: 10px;}
         .btn-pause { display: inline-block; width: auto; padding: 4px 10px; font-size: 12px; font-family: sans-serif; background-color: #795548; border: 1px solid #5d4037; box-shadow: none; }
+        
+        /* 小さくした「教科選択へ戻る」ボタン */
+        .btn-return-small {
+            margin-top: 10px;
+            padding: 6px 12px;
+            font-size: 13px;
+            background-color: #6d4c41;
+            border: 1px solid #4e342e;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            width: auto;
+            align-self: center;
+        }
 
-        /* 一時停止用のオーバーレイ幕 */
+        /* 一時停止用のオーバーレイ幕（重なり順を最前面に修正） */
         .pause-overlay {
             display: none;
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(26, 26, 26, 0.95);
-            z-index: 100;
+            background: rgba(26, 26, 26, 0.98);
+            z-index: 500;
             flex-direction: column;
             justify-content: center;
             align-items: center;
@@ -139,10 +151,41 @@
         .pause-title { font-family: 'Yuji Syuku', serif; color: var(--washi-white); font-size: 28px; margin-bottom: 25px; letter-spacing: 4px; }
         .btn-resume { width: 160px; }
 
-        /* メニュータブ */
+        /* 総合メニューグリッド */
+        .subject-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 10px;
+            flex: 1;
+            align-content: start;
+        }
+        .subject-btn {
+            background: var(--tatami-bg);
+            border: 3px solid var(--wood-dark);
+            border-radius: 8px;
+            padding: 20px 10px;
+            font-family: 'Yuji Syuku', serif;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--wood-dark);
+            cursor: pointer;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: background 0.2s;
+        }
+        .subject-btn:active { background: #e2d7be; }
+        .subject-btn.btn-mypage {
+            grid-column: span 2;
+            background: #e0f2f1;
+            border-color: #004d40;
+            color: #004d40;
+        }
+
+        /* 計算メニュー用タブ */
         .mypage-menu-tabs {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 4px;
             margin-bottom: 10px;
             flex-shrink: 0;
@@ -154,7 +197,7 @@
             border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 11px;
+            font-size: 12px;
             color: var(--wood-dark);
             font-family: 'Yuji Syuku', serif;
             text-align: center;
@@ -172,7 +215,6 @@
             padding-right: 2px;
         }
 
-        /* カテゴリタブ */
         .category-tabs { display: flex; flex-wrap: wrap; gap: 3px; border-bottom: 2px solid var(--wood-dark); }
         .tab-btn {
             padding: 6px 8px; background: #e0d7c7; border: 2px solid var(--wood-dark); border-bottom: none;
@@ -213,7 +255,7 @@
             display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--wood-dark); font-weight: bold;
             background: #ecdcb9; padding: 8px 12px; border-radius: 4px; flex-shrink: 0;
         }
-        .question-box { font-family: 'Yuji Syuku', serif; font-size: 38px; text-align: center; margin: 15px 0; font-weight: 800; position: relative; min-height: 50px; flex-shrink: 0; }
+        .question-box { font-family: 'Yuji Syuku', serif; font-size: 24px; text-align: center; margin: 15px 0; font-weight: 800; position: relative; min-height: 60px; flex-shrink: 0; display: flex; justify-content: center; align-items: center; padding: 0 10px; line-height: 1.3;}
         
         .judge-overlay {
             display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -223,23 +265,28 @@
         .judge-incorrect { color: var(--error-red); }
 
         .display-area {
-            background: #252525; color: #ffffff; font-size: 28px; font-family: monospace; text-align: right;
+            background: #252525; color: #ffffff; font-size: 24px; font-family: monospace; text-align: right;
             padding: 8px 15px; border-radius: 4px; min-height: 44px; margin-bottom: 10px; box-shadow: inset 0 3px 6px rgba(0,0,0,0.5); flex-shrink: 0;
+            word-break: break-all;
         }
         .error-msg { color: var(--error-red); text-align: center; font-weight: bold; margin-bottom: 5px; min-height: 16px; font-size: 12px; flex-shrink: 0; }
 
         /* キーボードのスマホ最適化 */
         .phone-keyboard { 
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; 
-            width: 100%; max-width: 340px; margin: 0 auto; flex: 1; align-content: center;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; 
+            width: 100%; max-width: 360px; margin: 0 auto; flex: 1; align-content: center;
+        }
+        .phone-keyboard.sc-mode {
+            grid-template-columns: repeat(4, 1fr);
         }
         .key-btn {
-            background: var(--tatami-bg); border: 2px solid var(--wood-light); color: var(--ink-black); font-size: 22px; font-weight: bold;
-            border-radius: 8px; box-shadow: 0 3px 4px rgba(0,0,0,0.15); cursor: pointer; display: flex; align-items: center; justify-content: center; height: 50px; user-select: none;
+            background: var(--tatami-bg); border: 2px solid var(--wood-light); color: var(--ink-black); font-size: 20px; font-weight: bold;
+            border-radius: 6px; box-shadow: 0 2px 3px rgba(0,0,0,0.15); cursor: pointer; display: flex; align-items: center; justify-content: center; height: 44px; user-select: none;
         }
         .key-btn:active { background-color: #d7ccc8; }
-        .key-btn.clear-btn { background-color: #fbe9e7; border-color: #ffab91; color: #d84315; font-size: 15px; }
-        .key-btn.action-btn { background-color: var(--tatami-border); border-color: #365314; color: white; font-size: 16px; }
+        .key-btn.clear-btn { background-color: #fbe9e7; border-color: #ffab91; color: #d84315; font-size: 14px; }
+        .key-btn.action-btn { background-color: var(--tatami-border); border-color: #365314; color: white; font-size: 15px; grid-column: span 1; }
+        .phone-keyboard.sc-mode .action-btn { grid-column: span 2; }
 
         table { width: 100%; border-collapse: separate; border-spacing: 0; border: 1px solid var(--wood-dark); border-radius: 4px; overflow: hidden; }
         th, td { padding: 6px 8px; text-align: left; border-bottom: 1px solid #d7ccc8; font-size: 12px; }
@@ -247,60 +294,28 @@
         
         .result-card { background: var(--tatami-bg); padding: 15px; border-radius: 4px; margin: 10px 0; border: 1px dashed var(--tatami-border); font-size: 14px; }
         
-        /* ⑤ 著作権クレジット下部完全固定 */
         .footer-credit { 
-            position: absolute;
-            bottom: 6px;
-            left: 0;
-            width: 100%;
-            text-align: center; 
-            font-size: 11px; 
-            color: var(--wood-light); 
-            font-family: 'Yuji Syuku', serif; 
-            z-index: 50;
-            background-color: transparent;
-            pointer-events: none;
+            position: absolute; bottom: 6px; left: 0; width: 100%; text-align: center; 
+            font-size: 11px; color: var(--wood-light); font-family: 'Yuji Syuku', serif; 
+            z-index: 400; background-color: transparent; pointer-events: none;
         }
         
-        /* ④ トップページ最下部の極小引継ぎボタンエリア */
-        .bottom-sync-trigger-zone {
-            position: absolute;
-            bottom: 20px;
-            left: 0;
-            width: 100%;
-            display: none;
-            justify-content: center;
-            z-index: 40;
+        /* マイページ内下部の引継ぎボタン */
+        .sync-trigger-container {
+            margin-top: 20px; text-align: center; border-top: 1px solid #d7ccc8; padding-top: 10px;
         }
         .btn-mini-sync {
-            background: none;
-            border: none;
-            color: #795548;
-            font-size: 10px;
-            text-decoration: underline;
-            cursor: pointer;
-            padding: 2px 10px;
+            background: none; border: none; color: #795548; font-size: 11px; text-decoration: underline; cursor: pointer;
         }
 
-        /* 引継ぎ用ポップアップ（モーダル窓） */
+        /* 引継ぎ用ポップアップ */
         .sync-modal {
-            display: none;
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            z-index: 200;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 600; justify-content: center; align-items: center; padding: 20px;
         }
         .sync-modal-content {
-            background: var(--washi-white);
-            border: 4px solid var(--wood-dark);
-            border-radius: 6px;
-            width: 100%;
-            max-width: 400px;
-            padding: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            background: var(--washi-white); border: 4px solid var(--wood-dark); border-radius: 6px;
+            width: 100%; max-width: 400px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
         .sync-box { width: 100%; height: 50px; font-size: 11px; margin-top: 3px; padding: 4px; border: 1px solid var(--wood-light); background: #fff; resize: none;}
     </style>
@@ -316,19 +331,17 @@
     <div id="sync-modal-window" class="sync-modal">
         <div class="sync-modal-content">
             <h4 style="margin: 0 0 10px 0; font-family:'Yuji Syuku', serif; color:var(--wood-dark); border-bottom:1px solid var(--wood-light); padding-bottom:3px;">📱 履歴の引継ぎ・同期</h4>
-            
             <button class="btn" style="padding:4px; font-size:11px; height:auto;" onclick="exportData()">1. 現在の記録を暗号コードにする</button>
-            <textarea id="sync-output" class="sync-box" readonly placeholder="ボタンを押すとここにコードが出ます。コピーして他端末へ送ってください。"></textarea>
+            <textarea id="sync-output" class="sync-box" readonly placeholder="コード生成後、コピーして他端末へ送ってください。"></textarea>
             
             <button class="btn btn-accent" style="padding:4px; font-size:11px; height:auto; margin-top:8px;" onclick="importData()">2. 他の端末のコードを読み込む</button>
             <textarea id="sync-input" class="sync-box" placeholder="コピーした暗号コードをここに貼り付けてください。"></textarea>
-            
             <button class="btn" style="margin-top:12px; padding:6px; background:#795548; font-size:12px;" onclick="closeSyncModal()">閉じる</button>
         </div>
     </div>
 
     <div class="header-title">
-        <h1>向上道場</h1>
+        <h1 id="main-app-title">向上道場</h1>
     </div>
 
     <div id="screen-login" class="screen active">
@@ -343,23 +356,30 @@
         <button class="btn btn-accent" onclick="loginOrRegister()">道場に入門する</button>
     </div>
 
-    <div id="screen-start" class="screen">
-        <div class="mypage-box">
-            <div class="mypage-header">
-                <div><span class="mypage-title" id="my-name"></span> 殿</div>
+    <div id="screen-hub" class="screen">
+        <div class="mypage-box" style="margin-bottom:5px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div><span id="hub-student-name" style="font-weight:bold; font-family:'Yuji Syuku', serif;"></span> 殿</div>
                 <button style="padding:2px 6px; font-size:11px;" onclick="logout()">道場を出る</button>
             </div>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:12px;">最高格付け:</span>
-                <span class="dan-badge" id="my-dan-badge">10級</span>
-            </div>
         </div>
+        <h2>修業の教科を選択せよ</h2>
+        <div class="subject-grid">
+            <button class="subject-btn" onclick="alert('漢字道場は現在、準備中です。')">漢字</button>
+            <button class="subject-btn" style="background:#fff3e0;" onclick="goToCalculationHub()">計算</button>
+            <button class="subject-btn" onclick="alert('英単語道場は現在、準備中です。')">英単語</button>
+            <button class="subject-btn" onclick="alert('英熟語道場は現在、準備中です。')">英熟語</button>
+            <button class="subject-btn" onclick="alert('理科道場は現在、準備中です。')">理科</button>
+            <button class="subject-btn" onclick="alert('社会道場は現在、準備中です。')">社会</button>
+            <button class="subject-btn btn-mypage" onclick="goToMypageScreen()">マイページ</button>
+        </div>
+    </div>
 
+    <div id="screen-start" class="screen">
         <div class="mypage-menu-tabs">
             <button class="menu-tab-btn active" id="menu-btn-practice" onclick="switchMainMenu('practice')">練習</button>
             <button class="menu-tab-btn" id="menu-btn-dan" onclick="switchMainMenu('dan')">段位道場</button>
             <button class="menu-tab-btn" id="menu-btn-ranking" onclick="switchMainMenu('ranking')">今週の番付</button>
-            <button class="menu-tab-btn" id="menu-btn-record" onclick="switchMainMenu('record')">個人の記録</button>
         </div>
 
         <div id="menu-content-practice" class="menu-content active">
@@ -403,7 +423,7 @@
                     <p style="margin: 0; font-weight: bold; color: var(--tatami-border); font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">すぐに20問テストが始まります！</p>
                 </div>
             </div>
-            <button class="btn btn-accent" onclick="startQuiz(false)">練習を開始する</button>
+            <button class="btn btn-accent" onclick="startQuiz(false)">計算練習を開始する</button>
         </div>
 
         <div id="menu-content-dan" class="menu-content">
@@ -424,20 +444,31 @@
             </div>
         </div>
 
-        <div id="menu-content-record" class="menu-content">
-            <div class="scrollable-content">
-                <div style="font-size:12px; margin-bottom:8px;">通算修行: <span id="total-count" style="font-weight:bold; color:var(--tatami-border);">0</span> 回</div>
-                <button id="btn-wrong-quiz" class="btn btn-wrong" style="display:none;" onclick="startWrongQuiz()">誤答を解き直す（残り <span id="wrong-count">0</span> 問）</button>
-                <table id="personal-best-table">
-                    <thead><tr><th>種目</th><th>最高正答率</th><th>最速タイム</th></tr></thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
+        <button class="btn btn-return-small" onclick="switchScreen('screen-hub')">⬅ 教科選択へ戻る</button>
     </div>
 
-    <div id="mini-sync-zone" class="bottom-sync-trigger-zone">
-        <button class="btn-mini-sync" onclick="openSyncModal()">履歴の引継ぎ・同期</button>
+    <div id="screen-mypage" class="screen">
+        <h2>門下生 個人記録</h2>
+        <div class="mypage-box">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div><span id="mp-student-name" style="font-weight:bold;"></span> 殿</div>
+                <span class="dan-badge" id="my-dan-badge">10級</span>
+            </div>
+            <div style="font-size:12px; margin-top:8px;">通算修行回数: <span id="total-count" style="font-weight:bold; color:var(--tatami-border);">0</span> 回</div>
+        </div>
+        
+        <div class="scrollable-content">
+            <button id="btn-wrong-quiz" class="btn btn-wrong" style="display:none;" onclick="startWrongQuiz()">誤答を解き直す（残り <span id="wrong-count">0</span> 問）</button>
+            <table id="personal-best-table">
+                <thead><tr><th>修業種目</th><th>最高正答率</th><th>最速タイム</th></tr></thead>
+                <tbody></tbody>
+            </table>
+
+            <div class="sync-trigger-container">
+                <button class="btn-mini-sync" onclick="openSyncModal()">履歴の引継ぎ・同期システムを開く</button>
+            </div>
+        </div>
+        <button class="btn btn-return-small" onclick="switchScreen('screen-hub')">⬅ 教科選択へ戻る</button>
     </div>
 
     <div id="screen-quiz" class="screen">
@@ -455,20 +486,7 @@
         <div class="display-area" id="answer-display"></div>
         <div class="error-msg" id="error-message"></div>
         
-        <div class="phone-keyboard">
-            <div class="key-btn" onclick="pressKey('1')">1</div>
-            <div class="key-btn" onclick="pressKey('2')">2</div>
-            <div class="key-btn" onclick="pressKey('3')">3</div>
-            <div class="key-btn" onclick="pressKey('4')">4</div>
-            <div class="key-btn" onclick="pressKey('5')">5</div>
-            <div class="key-btn" onclick="pressKey('6')">6</div>
-            <div class="key-btn" onclick="pressKey('7')">7</div>
-            <div class="key-btn" onclick="pressKey('8')">8</div>
-            <div class="key-btn" onclick="pressKey('9')">9</div>
-            <div class="key-btn clear-btn" onclick="pressKey('C')">C</div>
-            <div class="key-btn" onclick="pressKey('0')">0</div>
-            <div class="key-btn action-btn" onclick="submitAnswer()">決定</div>
-        </div>
+        <div id="dynamic-keyboard-box"></div>
     </div>
 
     <div id="screen-result" class="screen">
@@ -485,7 +503,7 @@
                 </div>
             </div>
         </div>
-        <button class="btn" onclick="backToStart()">マイページへ</button>
+        <button class="btn" onclick="backToHub()">次の修行へ</button>
     </div>
 
     <div class="footer-credit">by Que sais-je? Yayoi Kamagata</div>
@@ -503,40 +521,42 @@
     let currentInput = "";
     let isWrongQuizMode = false; 
     let isDanMode = false; 
+    let isScienceMode = false;
     let isWaitingForNext = false; 
     let beforeDanGrade = "10級";   
 
     function calculateDan(score) {
-        if (score < 26) return "師範";
-        if (score < 34) return "名人";
-        if (score < 40) return "五段";
-        if (score < 44) return "四段";
-        if (score < 48) return "三段";
-        if (score < 52) return "二段";
-        if (score < 56) return "初段";
-        if (score < 68) return "1級";
-        if (score < 80) return "2級";
-        if (score < 92) return "3級";
-        if (score < 104) return "4級";
-        if (score < 116) return "5級";
-        if (score < 128) return "6級";
-        if (score < 140) return "7級";
-        if (score < 152) return "8級";
-        if (score < 168) return "9級";
-        return "10級";
+        if (score < 26) return "師範"; if (score < 34) return "名人"; if (score < 40) return "五段";
+        if (score < 44) return "四段"; if (score < 48) return "三段"; if (score < 52) return "二段";
+        if (score < 56) return "初段"; if (score < 68) return "1級";  if (score < 80) return "2級";
+        if (score < 92) return "3級";  if (score < 104) return "4級"; if (score < 116) return "5級";
+        if (score < 128) return "6級"; if (score < 140) return "7級"; if (score < 152) return "8級";
+        if (score < 168) return "9級"; return "10級";
     }
 
     window.addEventListener('DOMContentLoaded', () => {
         const savedStudent = localStorage.getItem('dojo_v5_current_login');
         if (savedStudent) {
             currentStudent = savedStudent;
-            switchScreen('screen-start');
-            switchMainMenu('practice');
-            loadData();
+            showHubScreen();
         }
     });
 
-    // ④ ポップアップ制御関数
+    function showHubScreen() {
+        document.getElementById('hub-student-name').innerText = currentStudent;
+        switchScreen('screen-hub');
+    }
+
+    function goToCalculationHub() {
+        switchScreen('screen-start');
+        switchMainMenu('practice');
+    }
+
+    function goToMypageScreen() {
+        loadData();
+        switchScreen('screen-mypage');
+    }
+
     function openSyncModal() { document.getElementById('sync-modal-window').style.display = 'flex'; }
     function closeSyncModal() { document.getElementById('sync-modal-window').style.display = 'none'; }
 
@@ -549,7 +569,7 @@
         const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
         document.getElementById('sync-output').value = encoded;
         document.getElementById('sync-output').select();
-        alert("引き継ぎ暗号コードを作成しました！コピーして、もう一方の端末に貼り付けてください。");
+        alert("引き継ぎ暗号コードを作成しました！コピーして他端末へ送ってください。");
     }
 
     function importData() {
@@ -560,32 +580,26 @@
             if(decoded.users) localStorage.setItem('dojo_v5_users', decoded.users);
             if(decoded.results) localStorage.setItem('dojo_v5_results', decoded.results);
             if(decoded.wrong && currentStudent) localStorage.setItem('dojo_v5_wrong_' + currentStudent, decoded.wrong);
-            alert("同期に成功しました！データを反映します。");
+            alert("同期に成功しました！");
             closeSyncModal();
             loadData();
-        } catch(e) {
-            alert("正しい暗号コードではないか、データが破損しています。");
-        }
+        } catch(e) { alert("暗号コードが正しくありません。"); }
     }
 
     function loginOrRegister() {
         const nameInput = document.getElementById('login-name').value.trim();
         const bdayInput = document.getElementById('login-birthday').value.trim();
         if (!nameInput || !bdayInput) { alert('なまえと生年月日を入力してください！'); return; }
-        if (!/^\d{4,8}$/.test(bdayInput)) { alert('生年月日は数字で入力してください'); return; }
-
         let users = JSON.parse(localStorage.getItem('dojo_v5_users')) || {};
         if (users[nameInput]) {
-            if (users[nameInput].birthday !== bdayInput) { alert('なまえと生年月日が一致しません。'); return; }
+            if (users[nameInput].birthday !== bdayInput) { alert('生年月日が一致しません。'); return; }
         } else {
             users[nameInput] = { name: nameInput, birthday: bdayInput, highestScore: 99999 };
             localStorage.setItem('dojo_v5_users', JSON.stringify(users));
         }
         currentStudent = nameInput;
         localStorage.setItem('dojo_v5_current_login', currentStudent);
-        switchScreen('screen-start');
-        switchMainMenu('practice');
-        loadData();
+        showHubScreen();
     }
 
     function logout() {
@@ -600,20 +614,15 @@
         document.getElementById(`menu-btn-${menuKey}`).classList.add('active');
         document.getElementById(`menu-content-${menuKey}`).classList.add('active');
         if(menuKey === 'ranking') loadGlobalRanking();
-        if(menuKey === 'record') loadData();
     }
 
     function switchTab(tabId) {
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         event.target.classList.add('active');
         document.querySelectorAll('.sub-options').forEach(opt => opt.style.display = 'none');
-        
         const currentTab = document.getElementById(tabId);
-        if(tabId === 'tab-time') {
-            currentTab.style.display = 'block'; // TAタブは1行テキスト用
-        } else {
-            currentTab.style.display = 'grid';
-        }
+        if(tabId === 'tab-time') currentTab.style.display = 'block';
+        else currentTab.style.display = 'grid';
         
         if (tabId === 'tab-add') currentOption = '1桁+1桁';
         if (tabId === 'tab-sub') currentOption = '1桁-1桁';
@@ -636,16 +645,49 @@
         });
     }
 
+    function buildDynamicKeyboard() {
+        const box = document.getElementById('dynamic-keyboard-box');
+        box.innerHTML = `
+            <div class="phone-keyboard">
+                <div class="key-btn" onclick="pressKey('1')">1</div><div class="key-btn" onclick="pressKey('2')">2</div><div class="key-btn" onclick="pressKey('3')">3</div>
+                <div class="key-btn" onclick="pressKey('4')">4</div><div class="key-btn" onclick="pressKey('5')">5</div><div class="key-btn" onclick="pressKey('6')">6</div>
+                <div class="key-btn" onclick="pressKey('7')">7</div><div class="key-btn" onclick="pressKey('8')">8</div><div class="key-btn" onclick="pressKey('9')">9</div>
+                <div class="key-btn clear-btn" onclick="pressKey('C')">C</div><div class="key-btn" onclick="pressKey('0')">0</div><div class="key-btn action-btn" onclick="submitAnswer()">決定</div>
+            </div>`;
+    }
+
+    function startQuiz(danModeActive) {
+        isWrongQuizMode = false; isScienceMode = false; isDanMode = danModeActive;
+        let users = JSON.parse(localStorage.getItem('dojo_v5_users')) || {};
+        let myBestScore = users[currentStudent] ? users[currentStudent].highestScore : 99999;
+        beforeDanGrade = calculateDan(myBestScore);
+        questions = generateQuestions(isDanMode ? "タイムアタック" : currentOption);
+        initQuizExecution();
+    }
+
+    function startWrongQuiz() {
+        let wrongBank = JSON.parse(localStorage.getItem('dojo_v5_wrong_' + currentStudent)) || [];
+        if (wrongBank.length === 0) return;
+        isWrongQuizMode = true; isDanMode = false; isScienceMode = false; beforeDanGrade = "解き直し";
+        questions = wrongBank.sort(() => 0.5 - Math.random()).slice(0, 20); 
+        initQuizExecution();
+    }
+
+    function initQuizExecution() {
+        currentQuestionIndex = 0; correctCount = 0; currentInput = ""; isWaitingForNext = false; isPaused = false; elapsedBeforePause = 0;
+        document.getElementById('pause-screen').classList.remove('active');
+        buildDynamicKeyboard();
+        switchScreen('screen-quiz');
+        showQuestion();
+        startTime = performance.now();
+        startTimerLoop();
+    }
+
     function generateQuestions(mode) {
-        let list = [];
-        let limit = 20; 
-        let usedFormulas = new Set(); 
-        let attempts = 0; 
-        while (list.length < limit && attempts < 1000) {
-            attempts++;
+        let list = []; let usedFormulas = new Set();
+        while (list.length < 20) {
             let n1 = 0, n2 = 0, formula = "", ans = 0;
             let targetMode = mode === 'タイムアタック' ? ['1桁+1桁','2桁+1桁','1桁-1桁','1桁×1桁','1桁÷1桁'][rand(0,4)] : mode;
-
             if (targetMode.includes('+')) {
                 if(targetMode==='1桁+1桁') { n1=rand(1,9); n2=rand(1,9); }
                 else if(targetMode==='2桁+1桁') { n1=rand(10,99); n2=rand(1,9); }
@@ -667,69 +709,12 @@
                 else if(targetMode==='2桁÷1桁') { ans=rand(10,99); n2=rand(2,9); n1=ans*n2; }
                 else if(targetMode==='1桁×3桁') { n1=rand(1,9); n2=rand(100,999); formula=`${n1} × ${n2} =`; ans=n1*n2; }
                 if(targetMode!=='1桁×3桁') formula = `${n1} ÷ ${n2} =`;
-            } else {
-                n1=rand(10,99); n2=rand(1,9); formula = `${n1} + ${n2} =`; ans = n1 + n2;
             }
-
-            if (!usedFormulas.has(formula)) {
-                usedFormulas.add(formula);
-                list.push({ formula: formula, answer: ans });
-            }
+            if (!usedFormulas.has(formula)) { usedFormulas.add(formula); list.push({ formula: formula, answer: ans }); }
         }
         return list;
     }
     function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
-
-    function startQuiz(danModeActive) {
-        isWrongQuizMode = false;
-        isDanMode = danModeActive;
-        let users = JSON.parse(localStorage.getItem('dojo_v5_users')) || {};
-        let myBestScore = users[currentStudent] ? users[currentStudent].highestScore : 99999;
-        beforeDanGrade = calculateDan(myBestScore);
-        questions = generateQuestions(isDanMode ? "タイムアタック" : currentOption);
-        initQuizExecution();
-    }
-
-    function startWrongQuiz() {
-        let wrongBank = JSON.parse(localStorage.getItem('dojo_v5_wrong_' + currentStudent)) || [];
-        if (wrongBank.length === 0) return;
-        isWrongQuizMode = true;
-        isDanMode = false;
-        beforeDanGrade = "練習";
-        questions = wrongBank.sort(() => 0.5 - Math.random()).slice(0, 20); 
-        initQuizExecution();
-    }
-
-    function initQuizExecution() {
-        currentQuestionIndex = 0; correctCount = 0; currentInput = ""; isWaitingForNext = false; isPaused = false; elapsedBeforePause = 0;
-        document.getElementById('pause-screen').classList.remove('active');
-        switchScreen('screen-quiz');
-        showQuestion();
-        startTime = performance.now();
-        startTimerLoop();
-    }
-
-    // ② 番付は「昇段試練（タイムアタック）」のみを集計・ソートして表示
-    function loadGlobalRanking() {
-        let allResults = JSON.parse(localStorage.getItem('dojo_v5_results')) || [];
-        let users = JSON.parse(localStorage.getItem('dojo_v5_users')) || {};
-        let bestPerStudent = {};
-        
-        allResults.filter(item => item.mode === 'タイムアタック').forEach(item => {
-            if (!bestPerStudent[item.name] || item.score < bestPerStudent[item.name].score) bestPerStudent[item.name] = item;
-        });
-        
-        let rankedResults = Object.values(bestPerStudent).sort((a, b) => a.score - b.score);
-        const rankBody = document.querySelector('#global-ranking-table tbody');
-        rankBody.innerHTML = rankedResults.length === 0 ? "<tr><td colspan='5' style='text-align:center;'>データなし</td></tr>" : "";
-        
-        rankedResults.slice(0, 10).forEach((item, index) => {
-            let tr = document.createElement('tr');
-            let aDan = users[item.name] ? calculateDan(users[item.name].highestScore) : (item.afterDan || "10級");
-            tr.innerHTML = `<td>${index + 1}位</td><td>${item.name}</td><td>${aDan}</td><td>${item.accuracy}%</td><td>${item.time}秒</td>`;
-            rankBody.appendChild(tr);
-        });
-    }
 
     function startTimerLoop() {
         timerInterval = setInterval(() => {
@@ -777,10 +762,10 @@
         if (currentInput === "") { document.getElementById('error-message').innerText = "こたえを入力してください！"; return; }
         
         let currentQ = questions[currentQuestionIndex];
-        let studentAns = parseInt(currentInput, 10);
-        isWaitingForNext = true;
+        let isCorrect = (parseInt(currentInput, 10) === currentQ.answer);
         
-        if (studentAns === currentQ.answer) {
+        isWaitingForNext = true;
+        if (isCorrect) {
             correctCount++; document.getElementById('judge-correct').style.display = "block";
             if (isWrongQuizMode) removeWrongQuestion(currentQ.formula);
         } else {
@@ -790,16 +775,9 @@
         
         setTimeout(() => {
             currentQuestionIndex++;
-            if (currentQuestionIndex < questions.length) { showQuestion(); } else { endQuiz(); }
-        }, 300);
+            if (currentQuestionIndex < questions.length) showQuestion(); else endQuiz();
+        }, 400);
     }
-
-    window.addEventListener('keydown', function(e) {
-        if (!document.getElementById('screen-quiz').classList.contains('active') || isWaitingForNext || isPaused) return;
-        if (e.key >= '0' && e.key <= '9') pressKey(e.key);
-        else if (e.key === 'Backspace') { currentInput = currentInput.slice(0, -1); updateDisplay(); }
-        else if (e.key === 'Enter') submitAnswer();
-    });
 
     function endQuiz() {
         clearInterval(timerInterval);
@@ -816,7 +794,7 @@
         let score = (100 - accuracy) * 2 + parseFloat(totalTime);
         let currentNewDan = calculateDan(score);
         
-        if (isDanMode || currentOption === 'タイムアタック') {
+        if (isDanMode) {
             document.getElementById('res-dan-block').style.display = "block";
             document.getElementById('res-score').innerText = score.toFixed(2);
             document.getElementById('res-new-dan').innerText = currentNewDan;
@@ -830,7 +808,7 @@
             document.getElementById('res-dan-block').style.display = "none";
         }
 
-        if (!isWrongQuizMode) saveResult(currentStudent, isDanMode ? "タイムアタック" : currentOption, accuracy, parseFloat(totalTime), score, beforeDanGrade, currentNewDan);
+        saveResult(currentStudent, modeTitle, accuracy, parseFloat(totalTime), score, beforeDanGrade, currentNewDan);
         switchScreen('screen-result');
     }
 
@@ -854,8 +832,26 @@
         localStorage.setItem('dojo_v5_results', JSON.stringify(allResults));
     }
 
+    function loadGlobalRanking() {
+        let allResults = JSON.parse(localStorage.getItem('dojo_v5_results')) || [];
+        let users = JSON.parse(localStorage.getItem('dojo_v5_users')) || {};
+        let bestPerStudent = {};
+        allResults.filter(item => item.mode === '段位挑戦').forEach(item => {
+            if (!bestPerStudent[item.name] || item.score < bestPerStudent[item.name].score) bestPerStudent[item.name] = item;
+        });
+        let rankedResults = Object.values(bestPerStudent).sort((a, b) => a.score - b.score);
+        const rankBody = document.querySelector('#global-ranking-table tbody');
+        rankBody.innerHTML = rankedResults.length === 0 ? "<tr><td colspan='5' style='text-align:center;'>データなし</td></tr>" : "";
+        rankedResults.slice(0, 10).forEach((item, index) => {
+            let tr = document.createElement('tr');
+            let aDan = users[item.name] ? calculateDan(users[item.name].highestScore) : "10級";
+            tr.innerHTML = `<td>${index + 1}位</td><td>${item.name}</td><td>${aDan}</td><td>${item.accuracy}%</td><td>${item.time}秒</td>`;
+            rankBody.appendChild(tr);
+        });
+    }
+
     function loadData() {
-        document.getElementById('my-name').innerText = currentStudent;
+        document.getElementById('mp-student-name').innerText = currentStudent;
         let users = JSON.parse(localStorage.getItem('dojo_v5_users')) || {};
         let myBestScore = users[currentStudent] ? users[currentStudent].highestScore : 99999;
         document.getElementById('my-dan-badge').innerText = calculateDan(myBestScore);
@@ -868,33 +864,25 @@
         document.getElementById('btn-wrong-quiz').style.display = wrongBank.length > 0 ? "block" : "none";
         document.getElementById('wrong-count').innerText = wrongBank.length;
 
-        const modes = ['1桁+1桁', '2桁+1桁', '2桁+2桁', '3桁+2桁', '1桁-1桁', '2桁-1桁', '2桁-2桁', '3桁-2桁', '1桁×1桁', '1桁×2桁', '1桁÷1桁', '2桁÷1桁', '1桁×3桁', 'レベル1', 'レベル2', 'レベル3', 'タイムアタック'];
+        const modes = ['1桁+1桁', '2桁+1桁', '2桁+2桁', '3桁+2桁', '1桁-1桁', '2桁-1桁', '2桁-2桁', '3桁-2桁', '1桁×1桁', '1桁×2桁', '1桁÷1桁', '2桁÷1桁', '1桁×3桁', 'レベル1', 'レベル2', 'レベル3', '段位挑戦'];
         const bestBody = document.querySelector('#personal-best-table tbody');
         bestBody.innerHTML = "";
         modes.forEach(m => {
-            let mResults = myResults.filter(item => item.name === m);
+            let mResults = myResults.filter(item => item.mode === m);
             if (mResults.length > 0) {
                 mResults.sort((a, b) => b.accuracy - a.accuracy || a.time - b.time);
                 let tr = document.createElement('tr');
-                tr.innerHTML = `<td>${m === 'タイムアタック' ? 'TA(段位)' : m}</td><td>${mResults[0].accuracy}%</td><td>${mResults[0].time}秒</td>`;
+                tr.innerHTML = `<td>${m}</td><td>${mResults[0].accuracy}%</td><td>${mResults[0].time}秒</td>`;
                 bestBody.appendChild(tr);
             }
         });
     }
 
-    function backToStart() { loadData(); switchScreen('screen-start'); }
+    function backToHub() { showHubScreen(); }
     
     function switchScreen(screenId) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(screenId).classList.add('active');
-        
-        // マイページ画面のときだけ最下部に小さな引継ぎボタンを表示
-        const syncZone = document.getElementById('mini-sync-zone');
-        if(screenId === 'screen-start') {
-            syncZone.style.display = 'flex';
-        } else {
-            syncZone.style.display = 'none';
-        }
     }
 </script>
 </body>
